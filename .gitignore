@@ -72,4 +72,4 @@ datasets
 **/env.yaml
 
 # Mimic
-*.npz
+# *.npz
