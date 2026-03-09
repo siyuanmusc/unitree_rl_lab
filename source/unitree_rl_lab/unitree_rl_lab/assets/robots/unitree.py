@@ -715,3 +715,149 @@ for a in UNITREE_G1_29DOF_MIMIC_CFG.actuators.values():
     for n in names:
         if n in e and n in s and s[n]:
             UNITREE_G1_29DOF_MIMIC_ACTION_SCALE[n] = 0.25 * e[n] / s[n]
+
+
+UNITREE_G1_29DOF_MIMIC_UNITREE_ACT_CFG = UnitreeArticulationCfg(
+    spawn=UnitreeUsdFileCfg(
+        usd_path=f"{UNITREE_MODEL_DIR}/G1/29dof/usd/g1_29dof_rev_1_0/g1_29dof_rev_1_0.usd",
+    ),
+    init_state=ArticulationCfg.InitialStateCfg(
+        pos=(0.0, 0.0, 0.76),
+        joint_pos={
+            ".*_hip_pitch_joint": -0.312,
+            ".*_knee_joint": 0.669,
+            ".*_ankle_pitch_joint": -0.363,
+            ".*_elbow_joint": 0.6,
+            "left_shoulder_roll_joint": 0.2,
+            "left_shoulder_pitch_joint": 0.2,
+            "right_shoulder_roll_joint": -0.2,
+            "right_shoulder_pitch_joint": 0.2,
+        },
+        joint_vel={".*": 0.0},
+    ),
+    soft_joint_pos_limit_factor=0.9,
+    actuators={
+        # hip pitch / hip yaw / waist yaw
+        "n7520_14p3": unitree_actuators.UnitreeActuatorCfg_N7520_14p3(
+            joint_names_expr=[
+                ".*_hip_pitch_joint",
+                ".*_hip_yaw_joint",
+                "waist_yaw_joint",
+            ],
+            stiffness={
+                ".*_hip_pitch_joint": STIFFNESS_7520_14,
+                ".*_hip_yaw_joint": STIFFNESS_7520_14,
+                "waist_yaw_joint": STIFFNESS_7520_14,
+            },
+            damping={
+                ".*_hip_pitch_joint": DAMPING_7520_14,
+                ".*_hip_yaw_joint": DAMPING_7520_14,
+                "waist_yaw_joint": DAMPING_7520_14,
+            },
+        ),
+        # hip roll / knee
+        "n7520_22p5": unitree_actuators.UnitreeActuatorCfg_N7520_22p5(
+            joint_names_expr=[
+                ".*_hip_roll_joint",
+                ".*_knee_joint",
+            ],
+            stiffness={
+                ".*_hip_roll_joint": STIFFNESS_7520_22,
+                ".*_knee_joint": STIFFNESS_7520_22,
+            },
+            damping={
+                ".*_hip_roll_joint": DAMPING_7520_22,
+                ".*_knee_joint": DAMPING_7520_22,
+            },
+        ),
+        # ankle / waist roll / waist pitch / shoulders / elbows / wrist roll
+        "n5020_16": unitree_actuators.UnitreeActuatorCfg_N5020_16(
+            joint_names_expr=[
+                ".*_ankle_pitch_joint",
+                ".*_ankle_roll_joint",
+                "waist_roll_joint",
+                "waist_pitch_joint",
+                ".*_shoulder_pitch_joint",
+                ".*_shoulder_roll_joint",
+                ".*_shoulder_yaw_joint",
+                ".*_elbow_joint",
+                ".*_wrist_roll_joint",
+            ],
+            stiffness={
+                ".*_ankle_pitch_joint": 2.0 * STIFFNESS_5020,
+                ".*_ankle_roll_joint": 2.0 * STIFFNESS_5020,
+                "waist_roll_joint": 2.0 * STIFFNESS_5020,
+                "waist_pitch_joint": 2.0 * STIFFNESS_5020,
+                ".*_shoulder_pitch_joint": STIFFNESS_5020,
+                ".*_shoulder_roll_joint": STIFFNESS_5020,
+                ".*_shoulder_yaw_joint": STIFFNESS_5020,
+                ".*_elbow_joint": STIFFNESS_5020,
+                ".*_wrist_roll_joint": STIFFNESS_5020,
+            },
+            damping={
+                ".*_ankle_pitch_joint": 2.0 * DAMPING_5020,
+                ".*_ankle_roll_joint": 2.0 * DAMPING_5020,
+                "waist_roll_joint": 2.0 * DAMPING_5020,
+                "waist_pitch_joint": 2.0 * DAMPING_5020,
+                ".*_shoulder_pitch_joint": DAMPING_5020,
+                ".*_shoulder_roll_joint": DAMPING_5020,
+                ".*_shoulder_yaw_joint": DAMPING_5020,
+                ".*_elbow_joint": DAMPING_5020,
+                ".*_wrist_roll_joint": DAMPING_5020,
+            },
+        ),
+        # wrist pitch / wrist yaw
+        "w4010_25": unitree_actuators.UnitreeActuatorCfg_W4010_25(
+            joint_names_expr=[
+                ".*_wrist_pitch_joint",
+                ".*_wrist_yaw_joint",
+            ],
+            stiffness=STIFFNESS_4010,
+            damping=DAMPING_4010,
+        ),
+    },
+    joint_sdk_names=[
+        "left_hip_pitch_joint",
+        "left_hip_roll_joint",
+        "left_hip_yaw_joint",
+        "left_knee_joint",
+        "left_ankle_pitch_joint",
+        "left_ankle_roll_joint",
+        "right_hip_pitch_joint",
+        "right_hip_roll_joint",
+        "right_hip_yaw_joint",
+        "right_knee_joint",
+        "right_ankle_pitch_joint",
+        "right_ankle_roll_joint",
+        "waist_yaw_joint",
+        "waist_roll_joint",
+        "waist_pitch_joint",
+        "left_shoulder_pitch_joint",
+        "left_shoulder_roll_joint",
+        "left_shoulder_yaw_joint",
+        "left_elbow_joint",
+        "left_wrist_roll_joint",
+        "left_wrist_pitch_joint",
+        "left_wrist_yaw_joint",
+        "right_shoulder_pitch_joint",
+        "right_shoulder_roll_joint",
+        "right_shoulder_yaw_joint",
+        "right_elbow_joint",
+        "right_wrist_roll_joint",
+        "right_wrist_pitch_joint",
+        "right_wrist_yaw_joint",
+    ],
+)
+
+UNITREE_G1_29DOF_MIMIC_UNITREE_ACT_ACTION_SCALE = {}
+for a in UNITREE_G1_29DOF_MIMIC_UNITREE_ACT_CFG.actuators.values():
+    e = a.Y1
+    s = a.stiffness
+    names = a.joint_names_expr
+    if not isinstance(e, dict):
+        e = {n: e for n in names}
+    if not isinstance(s, dict):
+        s = {n: s for n in names}
+    for n in names:
+        if n in e and n in s and s[n]:
+            UNITREE_G1_29DOF_MIMIC_UNITREE_ACT_ACTION_SCALE[n] = 0.25 * e[n] / s[n]
