@@ -123,9 +123,9 @@ def run(args):
             q_xml[IDS] = orig_jp[frame]
             data.qpos[QA_JOINT:QA_JOINT+nj] = q_xml
 
-            # Robot B: 物理 motion（右，y+1.5）
+            # Robot B: 物理 motion（右，x+1.5）
             pos_b = phys_pos[frame].copy()
-            pos_b[1] += 1.5
+            pos_b[0] += 1.5
             data.qpos[QB_FREE:QB_FREE+3]   = pos_b
             data.qpos[QB_FREE+3:QB_FREE+7] = phys_quat[frame]
             q_xml = np.zeros(nj, dtype=np.float32)
