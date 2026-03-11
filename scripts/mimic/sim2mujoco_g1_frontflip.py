@@ -129,10 +129,14 @@ class MotionClip:
     def get_frame(self, t: float) -> dict:
         i = min(int(t / self.motion_dt), self.T - 1)
         return {
-            "joint_pos":   self.joint_pos[i],
-            "joint_vel":   self.joint_vel[i],
-            "body_pos_w":  self.body_pos_w[i],
-            "body_quat_w": self.body_quat_w[i],
+            "joint_pos":      self.joint_pos[i],
+            "joint_vel":      self.joint_vel[i],
+            "body_pos_w":     self.body_pos_w[i],
+            "body_quat_w":    self.body_quat_w[i],
+            "pelvis_pos":     self._bpos[i, 0].copy(),
+            "pelvis_quat":    self._bquat[i, 0].copy(),
+            "pelvis_lin_vel": self._blvel[i, 0].copy(),
+            "pelvis_ang_vel": self._bavel[i, 0].copy(),
         }
 
 
@@ -340,11 +344,9 @@ def load_policy(path: str, obs_dim: int):
 # ══════════════════════════════════════════════════════════════════
 
 def reset_to_frame(model, data, deploy: DeployConfig, ref: dict):
-    """用参考帧初始化仿真状态"""
     mujoco.mj_resetData(model, data)
     ids = deploy.joint_ids_map
 
-    # 关节：训练顺序 → MuJoCo xml 顺序（先设关节，再算 forward kinematics）
     q_xml  = np.zeros(deploy.num_joints, dtype=np.float32)
     dq_xml = np.zeros(deploy.num_joints, dtype=np.float32)
     q_xml[ids]  = ref["joint_pos"]
@@ -352,34 +354,12 @@ def reset_to_frame(model, data, deploy: DeployConfig, ref: dict):
     data.qpos[7:7+deploy.num_joints] = q_xml
     data.qvel[6:6+deploy.num_joints] = dq_xml
 
-    # root 朝向：qpos[3:7] 是 pelvis 的四元数
-    # ref 给的是 torso_link 的四元数，需要反推 pelvis 四元数
-    # pelvis_quat = ref_torso_quat * inv(local_torso_quat_in_pelvis_frame)
-    # 用 FK：先以单位朝向做 forward，得到 torso 相对 pelvis 的局部旋转
-    data.qpos[3:7] = [1., 0., 0., 0.]   # 先设 pelvis 为单位朝向
-    data.qpos[:3]  = [0., 0., 0.]
-    mujoco.mj_forward(model, data)
+    # 直接用 npz 的 pelvis pos/quat，不再反推
+    data.qpos[:3]  = ref["pelvis_pos"]
+    data.qpos[3:7] = ref["pelvis_quat"]
+    data.qvel[0:3] = ref["pelvis_lin_vel"]
+    data.qvel[3:6] = ref["pelvis_ang_vel"]
 
-    torso_id  = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_BODY, ANCHOR_BODY)
-    pelvis_id = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_BODY, "pelvis")
-
-    # torso 相对 pelvis 的局部四元数（pelvis 为单位时就是世界系的 torso quat）
-    torso_local_quat  = data.xquat[torso_id].copy()    # (w,x,y,z)
-    torso_local_pos   = data.xpos[torso_id].copy()
-    pelvis_local_pos  = data.xpos[pelvis_id].copy()
-    pelvis_to_torso_local = torso_local_pos - pelvis_local_pos
-
-    # 目标 torso 朝向
-    ref_anchor_quat = ref["body_quat_w"][ANCHOR_IDX_IN_TRACKED]
-    ref_anchor_pos  = ref["body_pos_w"][ANCHOR_IDX_IN_TRACKED]
-
-    # pelvis_quat = ref_torso_quat * inv(torso_local_quat)
-    pelvis_quat = quat_mul(ref_anchor_quat, quat_inv(torso_local_quat))
-    data.qpos[3:7] = pelvis_quat
-
-    # pelvis 位置：ref_torso_pos - rotate(pelvis_quat, pelvis_to_torso_local)
-    torso_offset_world = quat_apply(pelvis_quat, pelvis_to_torso_local)
-    data.qpos[:3] = ref_anchor_pos - torso_offset_world
     mujoco.mj_forward(model, data)
 
 
