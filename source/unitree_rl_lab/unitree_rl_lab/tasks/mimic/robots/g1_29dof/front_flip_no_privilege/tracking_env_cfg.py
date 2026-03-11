@@ -22,11 +22,9 @@ from isaaclab.utils import configclass
 from isaaclab.utils.noise import AdditiveUniformNoiseCfg as Unoise
 
 import unitree_rl_lab.tasks.mimic.mdp as mdp
-# from unitree_rl_lab.assets.robots.unitree import UNITREE_G1_29DOF_MIMIC_ACTION_SCALE
-# from unitree_rl_lab.assets.robots.unitree import UNITREE_G1_29DOF_MIMIC_CFG as ROBOT_CFG
-# from unitree_rl_lab.assets.robots.unitree import UNITREE_G1_29DOF_MIMIC_UNITREE_ACT_CFG as ROBOT_CFG
-from unitree_rl_lab.assets.robots.unitree import UNITREE_G1_29DOF_MIMIC_UNITREE_ACT_ACTION_SCALE
-from unitree_rl_lab.assets.robots.unitree import UNITREE_G1_29DOF_MIMIC_UNITREE_ACT_CFG as ROBOT_CFG
+from unitree_rl_lab.assets.robots.unitree import UNITREE_G1_29DOF_MIMIC_ACTION_SCALE
+from unitree_rl_lab.assets.robots.unitree import UNITREE_G1_29DOF_MIMIC_CFG as ROBOT_CFG
+
 ##
 # Scene definition
 ##
@@ -88,9 +86,7 @@ class CommandsCfg:
 
     motion = mdp.MotionCommandCfg(
         asset_name="robot",
-        # generate npz file before training
-        # python python scripts/mimic/csv_to_npz.py -f path/to/G1_gangnam_style_V01.bvh_60hz.csv --input_fps 60
-        motion_file=f"{os.path.dirname(__file__)}/front_flip.npz",
+        motion_file=f"{os.path.dirname(__file__)}/front_flip_physical.npz",
         anchor_body_name="torso_link",
         resampling_time_range=(1.0e9, 1.0e9),
         debug_vis=True,
@@ -128,7 +124,7 @@ class ActionsCfg:
     """Action specifications for the MDP."""
 
     JointPositionAction = mdp.JointPositionActionCfg(
-        asset_name="robot", joint_names=[".*"], scale=UNITREE_G1_29DOF_MIMIC_UNITREE_ACT_ACTION_SCALE, use_default_offset=True
+        asset_name="robot", joint_names=[".*"], scale=UNITREE_G1_29DOF_MIMIC_ACTION_SCALE, use_default_offset=True
     )
 
 
