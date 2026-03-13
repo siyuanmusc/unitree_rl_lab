@@ -67,6 +67,10 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
     data = np.load(args_cli.file)
     print("body_pos_w shape:", data["body_pos_w"].shape)
     robot: Articulation = scene["robot"]
+    print("body count:", len(robot.body_names))
+    print("joint count:", len(robot.joint_names))
+    for i, name in enumerate(robot.body_names):
+        print(f"  body[{i}] {name}")
     print("Isaac robot body count:", len(robot.body_names))
     print("Isaac robot bodies:")
     for i, name in enumerate(robot.body_names):
