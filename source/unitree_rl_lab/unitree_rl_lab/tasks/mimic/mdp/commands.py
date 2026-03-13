@@ -67,11 +67,34 @@ class MotionCommand(CommandTerm):
         self.robot: Articulation = env.scene[cfg.asset_name]
         self.robot_anchor_body_index = self.robot.body_names.index(self.cfg.anchor_body_name)
         self.motion_anchor_body_index = self.cfg.body_names.index(self.cfg.anchor_body_name)
-        self.body_indexes = torch.tensor(
-            self.robot.find_bodies(self.cfg.body_names, preserve_order=True)[0], dtype=torch.long, device=self.device
-        )
+        # self.body_indexes = torch.tensor(
+        #     self.robot.find_bodies(self.cfg.body_names, preserve_order=True)[0], dtype=torch.long, device=self.device
+        # )
+        body_indexes_raw, body_names_returned = self.robot.find_bodies(self.cfg.body_names, preserve_order=True)
+        self.body_indexes = torch.tensor(body_indexes_raw, dtype=torch.long, device=self.device)
 
+        print("=== BODY INDEX CHECK ===")
+        print(f"cfg.body_names order (what you want):")
+        for i, name in enumerate(self.cfg.body_names):
+            print(f"  [{i}] {name}")
+        print(f"find_bodies returned order (what you get):")
+        for i, (idx, name) in enumerate(zip(body_indexes_raw, body_names_returned)):
+            print(f"  [{i}] index={idx}  name={name}")
+        print("========================")
+        print("=== JOINT INDEX CHECK ===")
+        for i, name in enumerate(self.robot.joint_names):
+            print(f"  [{i:2d}] {name}")
+        print("=========================")
         self.motion = MotionLoader(self.cfg.motion_file, self.body_indexes, device=self.device)
+        # 加在这里
+        print("=== JOINT VALUE CHECK (frame 0) ===")
+        print("npz joint_pos (训练顺序):")
+        for i, val in enumerate(self.motion.joint_pos[0]):
+            print(f"  train[{i:2d}] = {val:.4f}")
+        print("IsaacLab joint order:")
+        for i, name in enumerate(self.robot.joint_names):
+            print(f"  [{i:2d}] {name}")
+        print("===================================")
         self.time_steps = torch.zeros(self.num_envs, dtype=torch.long, device=self.device)
         self.body_pos_relative_w = torch.zeros(self.num_envs, len(cfg.body_names), 3, device=self.device)
         self.body_quat_relative_w = torch.zeros(self.num_envs, len(cfg.body_names), 4, device=self.device)

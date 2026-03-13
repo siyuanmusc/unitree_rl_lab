@@ -64,7 +64,17 @@ class ReplayMotionsSceneCfg(InteractiveSceneCfg):
 
 def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
     # Extract scene entities
+    data = np.load(args_cli.file)
+    print("body_pos_w shape:", data["body_pos_w"].shape)
     robot: Articulation = scene["robot"]
+    print("Isaac robot body count:", len(robot.body_names))
+    print("Isaac robot bodies:")
+    for i, name in enumerate(robot.body_names):
+        print(f"  [{i:2d}] {name}")
+    print("csv_to_npz robot body count:", len(robot.body_names))
+    print("csv_to_npz robot bodies:")
+    for i, name in enumerate(robot.body_names):
+        print(f"  [{i:2d}] {name}")
     # Define simulation stepping
     sim_dt = sim.get_physics_dt()
 
