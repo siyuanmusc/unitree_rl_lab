@@ -18,7 +18,7 @@ from isaaclab.utils import configclass
 from unitree_rl_lab.assets.robots import unitree_actuators
 
 UNITREE_MODEL_DIR = "/home/user/Workspace/unitree_rl_lab/unitree_model"  # Replace with the actual path to your unitree_model directory
-UNITREE_ROS_DIR = "/home/user/Workspace/unitree_rl_lab/unitree_ros"  # Replace with the actual path to your unitree_ros package
+UNITREE_ROS_DIR = "/home/user/Workspace/unitree_rl_lab/unitree_description"  # Replace with the actual path to your unitree_ros package
 
 
 @configclass
@@ -396,7 +396,7 @@ UNITREE_G1_23DOF_CFG = UnitreeArticulationCfg(
 
 UNITREE_G1_29DOF_CFG = UnitreeArticulationCfg(
     spawn=UnitreeUrdfFileCfg(
-        asset_path=f"{UNITREE_ROS_DIR}/robots/g1_description/g1_29dof_rev_1_0.urdf",
+        asset_path=f"{UNITREE_ROS_DIR}/urdf/g1/main.urdf",
     ),
     # spawn=UnitreeUsdFileCfg(
     #     usd_path=f"{UNITREE_MODEL_DIR}/G1/29dof/usd/g1_29dof_rev_1_0/g1_29dof_rev_1_0.usd",
@@ -530,7 +530,7 @@ DAMPING_4010 = 2.0 * DAMPING_RATIO * ARMATURE_4010 * NATURAL_FREQ  # 1.068141502
 
 UNITREE_G1_29DOF_MIMIC_CFG = UnitreeArticulationCfg(
     spawn=UnitreeUrdfFileCfg(
-        asset_path=f"{UNITREE_ROS_DIR}/robots/g1_description/g1_29dof_rev_1_0.urdf",
+        asset_path=f"{UNITREE_ROS_DIR}/urdf/g1/main.urdf",
     ),
     # spawn=UnitreeUsdFileCfg(
     #     usd_path=f"{UNITREE_MODEL_DIR}/G1/29dof/usd/g1_29dof_rev_1_0/g1_29dof_rev_1_0.usd",
@@ -719,7 +719,7 @@ for a in UNITREE_G1_29DOF_MIMIC_CFG.actuators.values():
 
 UNITREE_G1_29DOF_MIMIC_UNITREE_ACT_CFG = UnitreeArticulationCfg(
     spawn=UnitreeUrdfFileCfg(
-        asset_path=f"{UNITREE_ROS_DIR}/robots/g1_description/g1_29dof_rev_1_0.urdf",
+        asset_path=f"{UNITREE_ROS_DIR}/urdf/g1/main.urdf",
     ),
     # spawn=UnitreeUsdFileCfg(
     #     usd_path=f"{UNITREE_MODEL_DIR}/G1/29dof/usd/g1_29dof_rev_1_0/g1_29dof_rev_1_0.usd",
